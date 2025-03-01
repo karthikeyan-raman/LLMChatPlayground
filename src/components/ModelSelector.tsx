@@ -109,7 +109,11 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           onChange={(e) => onModelChange(e.target.value)}
           sx={{ 
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px',
+              borderRadius: '14px',
+            },
+            '& .MuiSelect-select': {
+              py: 1.5, // More padding top/bottom for better visibility
+              pl: 2, // More left padding
             },
             '& .MuiOutlinedInput-notchedOutline': {
               borderWidth: '2px', // Thicker border
@@ -121,7 +125,12 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
               borderColor: 'rgba(79, 70, 229, 0.7)', // Even darker when focused
             },
-            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)', // Subtle shadow for depth
+            boxShadow: '0 4px 12px rgba(79, 70, 229, 0.15)', // Enhanced shadow for depth
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: '0 6px 16px rgba(79, 70, 229, 0.2)',
+            },
           }}
           renderValue={(selected) => {
             const model = models.find((m) => m.id === selected);
@@ -131,31 +140,54 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               <Box sx={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                gap: 1,
-                py: 0.5, // More padding for larger display
+                gap: 1.5,
+                py: 0.7, // More padding for larger display
               }}>
                 <Box 
                   sx={{ 
-                    backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
-                    p: 0.7,
-                    borderRadius: '8px',
+                    background: model.provider === 'anthropic' 
+                      ? 'linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%)' 
+                      : model.provider === 'openai' 
+                        ? 'linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)'
+                        : 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
+                    p: 1,
+                    borderRadius: '10px',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+                    color: 'white',
+                    width: 30,
+                    height: 30,
                   }}
                 >
                   {getProviderIcon(model.provider)}
                 </Box>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    fontWeight: 600, // Bolder text
-                    fontSize: '0.95rem', // Larger text
-                    color: 'primary.dark', // More prominent color
-                  }}
-                >
-                  {model.name}
-                </Typography>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <Typography 
+                    variant="subtitle2" 
+                    sx={{ 
+                      fontWeight: 700, // Bolder text
+                      fontSize: '1rem', // Larger text
+                      color: 'text.primary', // More prominent color
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {model.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 0.5,
+                    }}
+                  >
+                    {model.provider.charAt(0).toUpperCase() + model.provider.slice(1)} • {model.maxTokens.toLocaleString()} tokens
+                  </Typography>
+                </Box>
               </Box>
             );
           }}
@@ -165,32 +197,127 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
               key={model.id} 
               value={model.id}
               sx={{ 
-                borderRadius: '8px',
+                borderRadius: '12px',
                 mx: 0.5,
-                my: 0.5,
+                my: 0.8, // More vertical spacing
+                py: 1.5, // More vertical padding
+                px: 2, // More horizontal padding
+                transition: 'all 0.2s ease',
+                border: '1px solid transparent',
                 '&:hover': {
-                  backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08)
+                  backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                  border: '1px solid',
+                  borderColor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
+                },
+                '&.Mui-selected': {
+                  backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.12),
+                  border: '1px solid',
+                  borderColor: (theme) => alpha(theme.palette.primary.main, 0.3),
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    left: 0,
+                    top: 0,
+                    bottom: 0,
+                    width: '4px',
+                    borderRadius: '4px 0 0 4px',
+                    background: 'linear-gradient(to bottom, #4f46e5, #8b5cf6)',
+                  }
                 }
               }}
             >
               <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
-                  {getProviderIcon(model.provider)}
-                  <Typography variant="body1" sx={{ ml: 1 }}>{model.name}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                  <Box 
+                    sx={{ 
+                      background: model.provider === 'anthropic' 
+                        ? 'linear-gradient(135deg, #d946ef 0%, #8b5cf6 100%)' 
+                        : model.provider === 'openai' 
+                          ? 'linear-gradient(135deg, #10b981 0%, #0ea5e9 100%)'
+                          : 'linear-gradient(135deg, #f59e0b 0%, #ec4899 100%)',
+                      p: 0.8,
+                      borderRadius: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+                      color: 'white',
+                      width: 26,
+                      height: 26,
+                      mr: 1.5,
+                    }}
+                  >
+                    {getProviderIcon(model.provider)}
+                  </Box>
+                  <Typography 
+                    variant="subtitle1" 
+                    sx={{ 
+                      fontWeight: 700,
+                      letterSpacing: '0.2px',
+                    }}
+                  >
+                    {model.name}
+                  </Typography>
                 </Box>
-                <Typography variant="caption" color="text.secondary">
+                
+                <Typography 
+                  variant="body2" 
+                  color="text.secondary"
+                  sx={{
+                    ml: 4.5, // Align with model name after icon
+                    mb: 1,
+                    fontWeight: 500,
+                  }}
+                >
                   {model.description}
                 </Typography>
-                <Box sx={{ mt: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                  {model.capabilities.map((cap) => (
-                    <Chip
-                      key={cap}
-                      label={cap}
-                      size="small"
-                      variant="outlined"
-                      sx={{ height: 20, fontSize: '0.7rem' }}
-                    />
-                  ))}
+                
+                <Box sx={{ 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  justifyContent: 'space-between', 
+                  mt: 0.5,
+                  ml: 4.5, // Align with model name after icon
+                }}>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {model.capabilities.map((cap) => (
+                      <Chip
+                        key={cap}
+                        label={cap}
+                        size="small"
+                        variant="outlined"
+                        sx={{ 
+                          height: 24, 
+                          fontSize: '0.7rem',
+                          fontWeight: 600,
+                          borderRadius: '12px',
+                          backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.04),
+                          borderColor: (theme) => alpha(theme.palette.primary.main, 0.2),
+                          '& .MuiChip-label': {
+                            px: 1,
+                          }
+                        }}
+                      />
+                    ))}
+                  </Box>
+                  
+                  <Typography 
+                    variant="caption"
+                    sx={{ 
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                      fontSize: '0.7rem',
+                      bgcolor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: '12px',
+                    }}
+                  >
+                    {model.maxTokens.toLocaleString()} tokens
+                  </Typography>
                 </Box>
               </Box>
             </MenuItem>

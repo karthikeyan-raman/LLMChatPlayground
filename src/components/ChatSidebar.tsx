@@ -48,37 +48,78 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
         height: '100%',
         borderRight: '1px solid',
         borderColor: 'divider',
-        backgroundColor: 'background.paper',
+        backgroundColor: (theme) => alpha(theme.palette.background.paper, 0.85),
+        backdropFilter: 'blur(10px)',
         width: 280,
+        position: 'relative',
+        boxShadow: '0 0 20px rgba(0, 0, 0, 0.1)',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          height: '120px',
+          background: 'linear-gradient(180deg, rgba(79, 70, 229, 0.15) 0%, rgba(0, 0, 0, 0) 100%)',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }
       }}
     >
-      <Box sx={{ p: 2 }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+      <Box sx={{ p: 2.5, position: 'relative', zIndex: 1 }}>
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          mb: 3,
+          justifyContent: 'center',
+          position: 'relative',
+        }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              width: '100px',
+              height: '100px',
+              background: 'radial-gradient(circle, rgba(79, 70, 229, 0.4) 0%, rgba(125, 58, 237, 0) 70%)',
+              top: '-30px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              filter: 'blur(15px)',
+              zIndex: -1,
+            }}
+          />
           <Typography 
-            variant="h6" 
+            variant="h5" 
             component="h1" 
             sx={{
-              fontWeight: 'bold',
+              fontWeight: 800,
               background: 'linear-gradient(to right, #4f46e5, #9333ea)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               letterSpacing: '0.5px',
               display: 'flex',
               alignItems: 'center',
+              fontSize: '1.5rem',
+              textShadow: '0 2px 10px rgba(79, 70, 229, 0.3)',
             }}
           >
             <Box 
               component="span" 
               sx={{ 
                 display: 'inline-flex',
-                mr: 1,
-                p: 0.5,
-                borderRadius: '8px',
+                mr: 1.5,
+                p: 0.8,
+                borderRadius: '12px',
                 background: 'linear-gradient(45deg, #4f46e5, #7c3aed)',
-                boxShadow: '0 2px 8px rgba(79, 70, 229, 0.3)',
+                boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4), 0 0 0 2px rgba(79, 70, 229, 0.2)',
+                animation: 'pulse 2s infinite',
+                '@keyframes pulse': {
+                  '0%': { boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4), 0 0 0 2px rgba(79, 70, 229, 0.2)' },
+                  '50%': { boxShadow: '0 8px 16px rgba(79, 70, 229, 0.5), 0 0 0 3px rgba(79, 70, 229, 0.3)' },
+                  '100%': { boxShadow: '0 4px 12px rgba(79, 70, 229, 0.4), 0 0 0 2px rgba(79, 70, 229, 0.2)' }
+                }
               }}
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M17 3.5H7C4.79086 3.5 3 5.29086 3 7.5V16.5C3 18.7091 4.79086 20.5 7 20.5H17C19.2091 20.5 21 18.7091 21 16.5V7.5C21 5.29086 19.2091 3.5 17 3.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M9 8.5H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M9 12.5H15" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -92,29 +133,43 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
         <Button
           variant="contained"
           fullWidth
-          startIcon={<AddIcon />}
+          startIcon={<AddIcon sx={{ fontSize: '1.4rem' }} />}
           onClick={onNewChat}
           sx={{ 
-            mb: 2,
-            borderRadius: '14px',
-            py: 1.5, // Taller button
-            fontSize: '1rem', // Larger font
-            fontWeight: 'bold', // Bolder text
+            mb: 2.5,
+            borderRadius: '16px',
+            py: 1.8, // Taller button for better visibility
+            fontSize: '1.05rem', // Larger font
+            fontWeight: 800, // Extra bold for emphasis
             textTransform: 'none',
-            boxShadow: '0 6px 16px rgba(79, 70, 229, 0.35)', // Enhanced shadow
+            boxShadow: '0 8px 20px rgba(79, 70, 229, 0.35), 0 0 0 1px rgba(79, 70, 229, 0.2)',
             background: 'linear-gradient(45deg, #4f46e5, #7c3aed)',
-            border: '1px solid',
-            borderColor: 'primary.dark',
-            transition: 'all 0.3s ease',
-            letterSpacing: '0.5px', // Better letter spacing
+            position: 'relative',
+            overflow: 'hidden',
+            transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            letterSpacing: '0.6px', // Better letter spacing
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent)',
+              transform: 'translateX(-100%)',
+              transition: 'transform 0.8s ease',
+            },
             '&:hover': {
               background: 'linear-gradient(45deg, #4338ca, #6d28d9)',
-              boxShadow: '0 8px 20px rgba(79, 70, 229, 0.5)', // Even more pronounced shadow on hover
-              transform: 'translateY(-3px)', // More movement
+              boxShadow: '0 12px 24px rgba(79, 70, 229, 0.5), 0 0 0 2px rgba(79, 70, 229, 0.3)',
+              transform: 'translateY(-4px)',
+              '&::before': {
+                transform: 'translateX(100%)',
+              }
             },
             '&:active': {
-              transform: 'translateY(0)',
-              boxShadow: '0 2px 5px rgba(79, 70, 229, 0.3)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 8px rgba(79, 70, 229, 0.3)',
             }
           }}
         >
@@ -124,9 +179,10 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
       </Box>
       
       <Divider sx={{ 
-        opacity: 0.6,
-        borderColor: (theme) => alpha(theme.palette.divider, 0.5),
-        my: 0.5
+        height: '2px',
+        background: 'linear-gradient(to right, rgba(79, 70, 229, 0.2), rgba(147, 51, 234, 0.2))',
+        border: 'none',
+        my: 0.75,
       }} />
       
       <Box sx={{ px: 2, py: 1.5, display: 'flex', alignItems: 'center' }}>
