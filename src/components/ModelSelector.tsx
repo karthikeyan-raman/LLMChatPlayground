@@ -77,7 +77,16 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   return (
     <Box sx={{ minWidth: 200 }}>
       <FormControl fullWidth size="small">
-        <InputLabel id="model-select-label">Model</InputLabel>
+        <InputLabel 
+          id="model-select-label"
+          sx={{
+            fontWeight: 600, // Bolder label
+            fontSize: '0.9rem', // Larger label
+            color: 'primary.dark', // More prominent color
+          }}
+        >
+          Model
+        </InputLabel>
         <Select
           labelId="model-select-label"
           id="model-select"
@@ -86,17 +95,53 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
           onChange={(e) => onModelChange(e.target.value)}
           sx={{ 
             '& .MuiOutlinedInput-root': {
-              borderRadius: '12px'
-            } 
+              borderRadius: '12px',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderWidth: '2px', // Thicker border
+              borderColor: 'rgba(79, 70, 229, 0.3)', // Color matching app theme
+            },
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(79, 70, 229, 0.5)', // Darker on hover
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(79, 70, 229, 0.7)', // Even darker when focused
+            },
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)', // Subtle shadow for depth
           }}
           renderValue={(selected) => {
             const model = models.find((m) => m.id === selected);
             if (!model) return selected;
             
             return (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                {getProviderIcon(model.provider)}
-                <Typography variant="body2">{model.name}</Typography>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 1,
+                py: 0.5, // More padding for larger display
+              }}>
+                <Box 
+                  sx={{ 
+                    backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.1),
+                    p: 0.7,
+                    borderRadius: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {getProviderIcon(model.provider)}
+                </Box>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    fontWeight: 600, // Bolder text
+                    fontSize: '0.95rem', // Larger text
+                    color: 'primary.dark', // More prominent color
+                  }}
+                >
+                  {model.name}
+                </Typography>
               </Box>
             );
           }}

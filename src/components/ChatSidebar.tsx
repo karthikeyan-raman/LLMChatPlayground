@@ -8,6 +8,7 @@ import {
   Typography,
   Button,
   IconButton,
+  Paper,
   Divider,
   alpha,
 } from '@mui/material';
@@ -96,19 +97,20 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
           sx={{ 
             mb: 2,
             borderRadius: '14px',
-            py: 1.2,
-            fontSize: '0.9rem',
-            fontWeight: 'medium',
+            py: 1.5, // Taller button
+            fontSize: '1rem', // Larger font
+            fontWeight: 'bold', // Bolder text
             textTransform: 'none',
-            boxShadow: '0 4px 10px rgba(79, 70, 229, 0.3)',
+            boxShadow: '0 6px 16px rgba(79, 70, 229, 0.35)', // Enhanced shadow
             background: 'linear-gradient(45deg, #4f46e5, #7c3aed)',
             border: '1px solid',
             borderColor: 'primary.dark',
             transition: 'all 0.3s ease',
+            letterSpacing: '0.5px', // Better letter spacing
             '&:hover': {
               background: 'linear-gradient(45deg, #4338ca, #6d28d9)',
-              boxShadow: '0 6px 15px rgba(79, 70, 229, 0.4)',
-              transform: 'translateY(-2px)',
+              boxShadow: '0 8px 20px rgba(79, 70, 229, 0.5)', // Even more pronounced shadow on hover
+              transform: 'translateY(-3px)', // More movement
             },
             '&:active': {
               transform: 'translateY(0)',
@@ -276,16 +278,25 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                     primaryTypographyProps={{ 
                       noWrap: false,
                       variant: 'body2',
-                      fontWeight: chat.id === currentChatId ? 'medium' : 'regular',
+                      fontWeight: chat.id === currentChatId ? 'bold' : 'medium', // Bolder for active item
                       sx: { 
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
                         WebkitBoxOrient: 'vertical',
-                        lineHeight: 1.3,
-                        color: chat.id === currentChatId ? 'primary.main' : 'text.primary',
-                        mb: 0.5,
+                        lineHeight: 1.4, // Slightly increased line height
+                        // Gradient text color for active chat
+                        color: chat.id === currentChatId 
+                          ? 'transparent' 
+                          : 'text.primary',
+                        background: chat.id === currentChatId 
+                          ? 'linear-gradient(90deg, #4f46e5, #8b5cf6)' 
+                          : 'none',
+                        backgroundClip: chat.id === currentChatId ? 'text' : 'none',
+                        mb: 0.8, // More space
+                        fontSize: '0.95rem', // Larger text
+                        letterSpacing: '0.2px',
                       }
                     }}
                     secondaryTypographyProps={{ 
@@ -294,14 +305,19 @@ export const ChatSidebar: React.FC<ChatSidebarProps> = ({
                       component: 'div',
                       sx: {
                         display: 'inline-block',
-                        background: (theme) => alpha(theme.palette.primary.main, 0.1),
+                        background: (theme) => alpha(
+                          theme.palette.primary.main, 
+                          chat.id === currentChatId ? 0.2 : 0.1 // More contrast for active item
+                        ),
                         borderRadius: '12px',
-                        px: 1,
-                        py: 0.2,
-                        fontSize: '0.7rem',
+                        px: 1.2,
+                        py: 0.3,
+                        fontSize: '0.75rem', // Slightly larger date
+                        fontWeight: chat.id === currentChatId ? 'medium' : 'regular',
+                        boxShadow: chat.id === currentChatId ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
                       }
                     }}
-                    sx={{ my: 0.5 }}
+                    sx={{ my: 0.7 }} // More vertical space
                   />
                 </ListItemButton>
               </ListItem>
