@@ -626,7 +626,7 @@ const App: React.FC = () => {
                     letterSpacing: '0.5px'
                   }}
                 >
-                  Chat
+                  AI Chat
                 </Typography>
                 <Typography 
                   variant="h6" 
