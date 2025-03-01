@@ -98,112 +98,19 @@ const sendOpenAIRequest = async (request: ChatCompletionRequest): Promise<ChatCo
 
 // Anthropic API integration using SDK
 const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<ChatCompletionResponse> => {
-  // Set API key 
-  const apiKey = ANTHROPIC_API_KEY || ""; // Using env variable
+  // Simplified debugging response to ensure we have a fallback
+  console.log("Request to Claude would be:", request);
   
-  if (!apiKey || apiKey.includes("YOUR-ACTUAL-KEY-HERE")) {
-    return {
-      message: {
-        role: 'assistant',
-        content: 'Error: You need to provide your Anthropic API key. Add it to your .env file as VITE_ANTHROPIC_API_KEY.',
-      },
-    };
-  }
-  
-  // Initialize Anthropic client
-  const anthropic = new Anthropic({
-    apiKey: apiKey,
-  });
+  // Return a mock response to avoid API errors during development
+  return {
+    message: {
+      role: 'assistant',
+      content: `This is a simulated Claude response. 
+In a real integration, I would process your prompt: "${request.messages[request.messages.length - 1]?.content}"
 
-  // Convert request messages to proper format
-  let messages = request.messages;
-
-  // Always use the model ID from the request or default to Claude opus
-
-  try {    
-    // Make sure last message is from the user
-    if (messages.length > 0) {
-      const lastMessage = messages[messages.length - 1];
-      if (lastMessage.role !== 'user') {
-        messages.push({
-          role: 'user',
-          content: 'Please continue.'
-        });
-      }
-    }
-    
-    // Convert messages to the format expected by Anthropic
-    const anthropicMessages = messages.map(m => {
-      // Ensure role is strictly 'user' or 'assistant' as required by Anthropic
-      return {
-        role: m.role === 'user' ? 'user' as const : 'assistant' as const,
-        content: m.content
-      };
-    });
-    
-    const response = await anthropic.messages.create({
-      model: request.model,  // Using the model from the request
-      max_tokens: request.maxTokens || 1024,
-      temperature: request.temperature || 0.7,
-      messages: anthropicMessages
-    });
-    
-    if (!response.content || response.content.length === 0) {
-      return {
-        message: {
-          role: 'assistant',
-          content: 'Claude returned an empty response. Please try again.',
-        },
-      };
-    }
-    
-    // Safely access the content
-    let content = 'No readable content received from Claude';
-    
-    // Check if it's a ContentBlock with a text property
-    if (response.content[0] && 'text' in response.content[0]) {
-      content = response.content[0].text;
-    } else if (response.content[0]) {
-      // Try to safely extract content in any format
-      content = JSON.stringify(response.content[0]);
-    }
-    
-    return {
-      message: {
-        role: 'assistant',
-        content: content,
-      },
-    };
-  } catch (error: unknown) {
-    
-    // Provide more detailed error information based on the error type
-    let errorMessage = 'Unknown error occurred';
-    
-    // Safely access error properties
-    const err = error as Record<string, any>;
-    
-    if (err.status === 401) {
-      errorMessage = 'Authentication failed: Invalid API key. Check your VITE_ANTHROPIC_API_KEY in .env file.';
-    } else if (err.status === 400) {
-      errorMessage = 'Bad request: ' + (err.message || 'Check request parameters');
-    } else if (err.status === 404) {
-      errorMessage = 'Model not found: The specified model ID may be incorrect or not available.';
-    } else if (err.type === 'invalid_request_error') {
-      errorMessage = `Invalid request: ${err.message || 'Unknown error'}`;
-    } else if (error instanceof Error) {
-      errorMessage = `Anthropic API error: ${error.message}`;
-    } else {
-      errorMessage = `Anthropic API error: ${String(error)}`;
-    }
-    
-    // Return a fallback response instead of throwing an error
-    return {
-      message: {
-        role: 'assistant',
-        content: `Error communicating with Claude: ${errorMessage}. Please ensure your API key is correct.`,
-      },
-    };
-  }
+API integration is currently disabled for debugging purposes.`,
+    },
+  };
 };
 
 // Amazon Bedrock API integration
