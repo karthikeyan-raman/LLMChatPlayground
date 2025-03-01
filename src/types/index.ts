@@ -6,8 +6,20 @@ export interface LLMModel {
   maxTokens: number;
   defaultTokens?: number;
   defaultTemperature?: number;
+  defaultTopP?: number;
+  defaultFrequencyPenalty?: number;
+  defaultPresencePenalty?: number;
   capabilities: string[];
 }
+
+export type ParameterPreset = {
+  name: string;
+  description: string;
+  temperature: number;
+  topP: number;
+  frequencyPenalty: number;
+  presencePenalty: number;
+};
 
 export interface ChatMessage {
   id: string;
@@ -15,6 +27,7 @@ export interface ChatMessage {
   content: string;
   timestamp: number;
   attachments?: Attachment[];
+  modelId?: string; // The model ID used for this message (for assistant messages)
 }
 
 export interface Chat {
@@ -45,6 +58,9 @@ export interface ChatStateData {
   selectedModelId: string;
   maxTokens: number;
   temperature: number;
+  topP: number;
+  frequencyPenalty: number;
+  presencePenalty: number;
   isLoading: boolean;
   error: string | null;
 }
@@ -60,6 +76,10 @@ export interface ChatStateActions {
   setSelectedModel: (modelId: string) => void;
   setMaxTokens: (tokens: number) => void;
   setTemperature: (temp: number) => void;
+  setTopP: (value: number) => void;
+  setFrequencyPenalty: (value: number) => void;
+  setPresencePenalty: (value: number) => void;
+  applyParameterPreset: (preset: ParameterPreset) => void;
   setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
   clearState: () => void;

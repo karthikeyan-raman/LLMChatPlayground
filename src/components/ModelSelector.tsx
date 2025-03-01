@@ -13,7 +13,7 @@ import {
   IconButton,
   Collapse
 } from '@mui/material';
-import { LLMModel } from '../types';
+import { LLMModel, ParameterPreset } from '../types';
 import TuneIcon from '@mui/icons-material/Tune';
 import { ModelSettings } from './ModelSettings';
 
@@ -25,9 +25,16 @@ interface ModelSelectorProps {
   selectedModelId: string;
   maxTokens: number;
   temperature: number;
+  topP: number;
+  frequencyPenalty: number;
+  presencePenalty: number;
   onModelChange: (modelId: string) => void;
   onMaxTokensChange: (tokens: number) => void;
   onTemperatureChange: (temp: number) => void;
+  onTopPChange: (value: number) => void;
+  onFrequencyPenaltyChange: (value: number) => void;
+  onPresencePenaltyChange: (value: number) => void;
+  onApplyPreset: (preset: ParameterPreset) => void;
 }
 
 // Provider icon components
@@ -54,9 +61,16 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   selectedModelId,
   maxTokens,
   temperature,
+  topP,
+  frequencyPenalty,
+  presencePenalty,
   onModelChange,
   onMaxTokensChange,
-  onTemperatureChange
+  onTemperatureChange,
+  onTopPChange,
+  onFrequencyPenaltyChange,
+  onPresencePenaltyChange,
+  onApplyPreset
 }) => {
   const [showSettings, setShowSettings] = useState(false);
   const selectedModel = models.find((model) => model.id === selectedModelId);
@@ -255,11 +269,18 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             <ModelSettings
               currentMaxTokens={maxTokens}
               currentTemperature={temperature}
+              currentTopP={topP}
+              currentFrequencyPenalty={frequencyPenalty}
+              currentPresencePenalty={presencePenalty}
               defaultMaxTokens={selectedModel.defaultTokens || 4096}
               defaultTemperature={selectedModel.defaultTemperature || 0.7}
               maxPossibleTokens={selectedModel.maxTokens}
               onMaxTokensChange={onMaxTokensChange}
               onTemperatureChange={onTemperatureChange}
+              onTopPChange={onTopPChange}
+              onFrequencyPenaltyChange={onFrequencyPenaltyChange}
+              onPresencePenaltyChange={onPresencePenaltyChange}
+              onApplyPreset={onApplyPreset}
             />
           </Collapse>
         </>

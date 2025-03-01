@@ -1,7 +1,43 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { ChatState, ChatStateData, Chat, ChatMessage, Attachment, LLMModel } from '../types';
+import { ChatState, ChatStateData, Chat, ChatMessage, Attachment, LLMModel, ParameterPreset } from '../types';
+
+// Parameter presets
+export const parameterPresets: ParameterPreset[] = [
+  {
+    name: 'Precise',
+    description: 'Highly deterministic with minimal randomness (best for factual Q&A)',
+    temperature: 0.1,
+    topP: 0.9,
+    frequencyPenalty: 0.0,
+    presencePenalty: 0.0
+  },
+  {
+    name: 'Balanced',
+    description: 'Default middle-ground settings for general use',
+    temperature: 0.7,
+    topP: 0.95,
+    frequencyPenalty: 0.0,
+    presencePenalty: 0.0
+  },
+  {
+    name: 'Creative',
+    description: 'High variability for more novel and diverse outputs',
+    temperature: 0.9,
+    topP: 1.0,
+    frequencyPenalty: 0.3,
+    presencePenalty: 0.2
+  },
+  {
+    name: 'Very Creative',
+    description: 'Maximum creativity and variability (stories, brainstorming)',
+    temperature: 1.0,
+    topP: 1.0,
+    frequencyPenalty: 0.5,
+    presencePenalty: 0.5
+  }
+];
 
 // Available LLM models
 const models: LLMModel[] = [
@@ -75,6 +111,9 @@ const initialState: ChatStateData = {
   selectedModelId: 'amazon-nova-pro',
   maxTokens: 4096,
   temperature: 0.7,
+  topP: 0.95,
+  frequencyPenalty: 0.0,
+  presencePenalty: 0.0,
   isLoading: false,
   error: null,
 };
@@ -139,10 +178,13 @@ export const useStore = create<ChatState>()(
 
       // Message actions
       addMessage: (chatId: string, message: Omit<ChatMessage, 'id' | 'timestamp'>) => {
+        const { selectedModelId } = get();
         const newMessage: ChatMessage = {
           ...message,
           id: uuidv4(),
           timestamp: Date.now(),
+          // Add modelId to assistant messages
+          ...(message.role === 'assistant' ? { modelId: selectedModelId } : {})
         };
 
         set((state) => ({
@@ -229,6 +271,27 @@ export const useStore = create<ChatState>()(
       
       setTemperature: (temp: number) => {
         set({ temperature: temp });
+      },
+      
+      setTopP: (value: number) => {
+        set({ topP: value });
+      },
+      
+      setFrequencyPenalty: (value: number) => {
+        set({ frequencyPenalty: value });
+      },
+      
+      setPresencePenalty: (value: number) => {
+        set({ presencePenalty: value });
+      },
+      
+      applyParameterPreset: (preset: ParameterPreset) => {
+        set({ 
+          temperature: preset.temperature,
+          topP: preset.topP,
+          frequencyPenalty: preset.frequencyPenalty,
+          presencePenalty: preset.presencePenalty
+        });
       },
 
       // Loading state
