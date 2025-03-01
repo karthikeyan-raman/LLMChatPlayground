@@ -327,63 +327,75 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       
       {selectedModel && (
         <>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
-            <Tooltip
-              title={
-                <Box>
-                  <Typography variant="body2">{selectedModel.description}</Typography>
-                  <Typography variant="caption" display="block" sx={{ mt: 1 }}>
-                    Max tokens: {selectedModel.maxTokens.toLocaleString()}
-                  </Typography>
-                  <Box sx={{ mt: 1 }}>
-                    {selectedModel.capabilities.map((cap) => (
-                      <Chip
-                        key={cap}
-                        label={cap}
-                        size="small"
-                        variant="outlined"
-                        sx={{ mr: 0.5, mt: 0.5, height: 20, fontSize: '0.7rem' }}
-                      />
-                    ))}
-                  </Box>
-                </Box>
-              }
-              placement="top"
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1.5 }}>
+            <Box 
+              sx={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                flexGrow: 1,
+                p: 1.2,
+                borderRadius: '12px',
+                border: '1px solid',
+                borderColor: 'divider',
+                backgroundColor: 'rgba(0, 0, 0, 0.05)',
+                position: 'relative',
+                overflow: 'hidden',
+                '&::before': {
+                  content: '""',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '3px',
+                  height: '100%',
+                  background: selectedModel.provider === 'anthropic' 
+                    ? 'linear-gradient(to bottom, #d946ef, #8b5cf6)' 
+                    : selectedModel.provider === 'openai' 
+                      ? 'linear-gradient(to bottom, #10b981, #0ea5e9)'
+                      : 'linear-gradient(to bottom, #f59e0b, #ec4899)',
+                }
+              }}
             >
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                  border: '1px solid',
-                  borderColor: 'divider',
-                  borderRadius: '12px',
-                  cursor: 'help',
-                  flex: 1,
-                }}
-              >
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                  {getProviderIcon(selectedModel.provider)}
-                  <Typography variant="caption" sx={{ ml: 1 }}>
-                    Max: {selectedModel.maxTokens.toLocaleString()} tokens
+              <Box sx={{ pl: 1, flexGrow: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.5 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    Active Model: {selectedModel.name}
                   </Typography>
                 </Box>
-              </Paper>
-            </Tooltip>
+                
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {selectedModel.capabilities.map((cap) => (
+                    <Chip
+                      key={cap}
+                      label={cap}
+                      size="small"
+                      variant="outlined"
+                      sx={{ 
+                        height: 20, 
+                        fontSize: '0.7rem',
+                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        borderColor: 'rgba(255, 255, 255, 0.2)'
+                      }}
+                    />
+                  ))}
+                </Box>
+              </Box>
+            </Box>
             
-            <Tooltip title="Model settings">
+            <Tooltip title={showSettings ? "Hide model settings" : "Show model settings"}>
               <IconButton 
                 onClick={() => setShowSettings(!showSettings)}
                 sx={{ 
-                  ml: 1,
-                  backgroundColor: showSettings ? 'rgba(79, 70, 229, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+                  ml: 1.5,
+                  backgroundColor: showSettings ? 'rgba(79, 70, 229, 0.3)' : 'rgba(0, 0, 0, 0.1)',
                   borderRadius: '12px',
                   border: '1px solid',
-                  borderColor: 'divider',
+                  borderColor: showSettings ? 'rgba(79, 70, 229, 0.3)' : 'divider',
+                  width: 40,
+                  height: 40,
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    backgroundColor: 'rgba(79, 70, 229, 0.3)',
+                    transform: 'scale(1.05)',
                   }
                 }}
               >
@@ -392,7 +404,61 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
             </Tooltip>
           </Box>
           
-          <Collapse in={showSettings} timeout={300} sx={{ mt: 2 }}>
+          <Box sx={{ display: 'flex', mt: 1, mb: showSettings ? 2 : 0 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%', justifyContent: 'space-between' }}>
+              <Tooltip title="Temperature controls randomness in responses (lower = more focused, higher = more creative)">
+                <Box 
+                  sx={{
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 0.5,
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)', 
+                    px: 1, 
+                    py: 0.5, 
+                    borderRadius: '8px',
+                    border: '1px solid rgba(79, 70, 229, 0.2)'
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>Temp: {temperature.toFixed(1)}</Typography>
+                </Box>
+              </Tooltip>
+              
+              <Tooltip title="Maximum token length for AI response">
+                <Box 
+                  sx={{
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    gap: 0.5,
+                    backgroundColor: 'rgba(79, 70, 229, 0.1)', 
+                    px: 1, 
+                    py: 0.5, 
+                    borderRadius: '8px',
+                    border: '1px solid rgba(79, 70, 229, 0.2)'
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                    Max: {maxTokens >= 1000 ? `${(maxTokens/1000).toFixed(1)}K` : maxTokens}
+                  </Typography>
+                </Box>
+              </Tooltip>
+              
+              <Typography 
+                variant="caption" 
+                color="text.secondary" 
+                sx={{ 
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  opacity: 0.8,
+                  '&:hover': { opacity: 1 }
+                }}
+                onClick={() => setShowSettings(!showSettings)}
+              >
+                {showSettings ? 'Hide settings' : 'Advanced settings'}
+              </Typography>
+            </Box>
+          </Box>
+          
+          <Collapse in={showSettings} timeout={300} sx={{ mt: 1 }}>
             <ModelSettings
               currentMaxTokens={maxTokens}
               currentTemperature={temperature}

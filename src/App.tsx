@@ -490,9 +490,8 @@ const App: React.FC = () => {
         responseContent = `I've received your message with ${attachments.length} attachment(s) (${fileTypes}). `;
         responseContent += inputMessage.trim() ? `About your message: "${inputMessage}"` : 'Let me know if you need help with these files.';
       } else {
-        // Include model settings in the response
-        responseContent = `[Temperature: ${temperature.toFixed(1)}, Max Tokens: ${maxTokens}] `;
-        responseContent += `This is a ${getCurrentModel().name} response to: "${inputMessage}"`;
+        // No longer include model settings directly in the response
+        responseContent = `This is a ${getCurrentModel().name} response to: "${inputMessage}"`;
       }
       
       // If streaming is enabled, simulate it by sending response in chunks

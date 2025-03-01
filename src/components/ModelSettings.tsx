@@ -119,7 +119,14 @@ export const ModelSettings: React.FC<ModelSettingsProps> = ({
       }}
     >
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-        <Typography variant="subtitle1" fontWeight="bold">Model Settings</Typography>
+        <Box>
+          <Typography variant="subtitle1" fontWeight="bold" sx={{ mb: 0.5 }}>
+            Model Settings
+          </Typography>
+          <Typography variant="caption" color="text.secondary">
+            Current settings: Temperature {currentTemperature.toFixed(1)}, Max tokens {currentMaxTokens.toLocaleString()}
+          </Typography>
+        </Box>
         <Tooltip title="Reset to defaults">
           <Button
             size="small"
