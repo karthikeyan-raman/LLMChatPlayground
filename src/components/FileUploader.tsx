@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, CircularProgress, List, ListItem, ListItemText, ListItemIcon, Button, Chip } from '@mui/material';
+import { Box, Typography, CircularProgress, List, ListItem, ListItemText, ListItemIcon, Button, Chip } from '@mui/material';
 import { useFileUpload } from '../hooks/useFileUpload';
 import { formatFileSize } from '../utils/fileHelpers';
 import { FileType } from '../types';
@@ -47,7 +47,6 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFilesUploaded, mes
     setAttachments,
     error,
     clearFiles,
-    onDrop,
   } = useFileUpload({
     maxFiles: 5,
     maxSize: 10 * 1024 * 1024, // 10MB
@@ -58,7 +57,6 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFilesUploaded, mes
       // In a real implementation, this would upload files to a server
       // For demo purposes, we'll just pass the attachments to the parent component
       const fileIds = attachments.map((_, index) => `${messageId}-${index}`);
-      console.log('Preparing to upload files with IDs:', fileIds);
       
       // Pass the file IDs to the parent component
       onFilesUploaded(fileIds);
@@ -117,8 +115,6 @@ export const FileUploader: React.FC<FileUploaderProps> = ({ onFilesUploaded, mes
             ];
             
             // Log to console for debugging
-            console.log("Creating test files:", files);
-            
             // Add the files to our file list
             setFiles(files);
             

@@ -22,27 +22,11 @@ const OPENAI_API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 const ANTHROPIC_API_KEY = import.meta.env.VITE_ANTHROPIC_API_KEY;
 const AWS_ACCESS_KEY = import.meta.env.VITE_AWS_ACCESS_KEY;
 const AWS_SECRET_KEY = import.meta.env.VITE_AWS_SECRET_KEY;
-const AWS_REGION = import.meta.env.VITE_AWS_REGION || 'us-east-1';
+// AWS region can be configured in .env
 
-// Log available environment variables (without revealing full keys)
-console.log('Environment variables loaded:', {
-  OPENAI_API_KEY: OPENAI_API_KEY ? `${OPENAI_API_KEY.substring(0, 3)}...${OPENAI_API_KEY.substring(OPENAI_API_KEY.length - 3)}` : 'undefined',
-  ANTHROPIC_API_KEY: ANTHROPIC_API_KEY ? `${ANTHROPIC_API_KEY.substring(0, 3)}...${ANTHROPIC_API_KEY.substring(ANTHROPIC_API_KEY.length - 3)}` : 'undefined',
-  AWS_ACCESS_KEY: AWS_ACCESS_KEY ? `${AWS_ACCESS_KEY.substring(0, 3)}...${AWS_ACCESS_KEY.substring(AWS_ACCESS_KEY.length - 3)}` : 'undefined',
-  AWS_SECRET_KEY: AWS_SECRET_KEY ? 'defined' : 'undefined',
-  AWS_REGION,
-});
+// Environment variables have been loaded from .env file
 
-// FOR TESTING: If you don't see API keys in your browser console, 
-// the .env file might not be loading correctly in Vite
-// Here we'll manually set the key for testing
-if (typeof window !== 'undefined') {
-  (window as any).testApiKey = function(key: string) {
-    console.log('Setting test API key:', key);
-    // This is a simple helper function to test if API keys work
-    // Open browser console and run: testApiKey('sk-ant-api03-your-key-here')
-  };
-}
+// API keys should be configured in .env file
 
 // Real implementation that makes API calls to different LLM providers
 export const sendChatRequest = async (
@@ -114,22 +98,17 @@ const sendOpenAIRequest = async (request: ChatCompletionRequest): Promise<ChatCo
 
 // Anthropic API integration using SDK
 const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<ChatCompletionResponse> => {
-  console.log('Using Anthropic integration...');
-  
   // Set API key 
   const apiKey = ANTHROPIC_API_KEY || ""; // Using env variable
   
   if (!apiKey || apiKey.includes("YOUR-ACTUAL-KEY-HERE")) {
-    console.error('You need to provide your actual Anthropic API key');
     return {
       message: {
         role: 'assistant',
-        content: 'Error: You need to provide your Anthropic API key. Either add it to your .env file as VITE_ANTHROPIC_API_KEY or edit the chatService.ts file to hardcode it (just for testing).',
+        content: 'Error: You need to provide your Anthropic API key. Add it to your .env file as VITE_ANTHROPIC_API_KEY.',
       },
     };
   }
-
-  console.log('Using API key starting with:', apiKey.substring(0, 10) + '...');
   
   // Initialize Anthropic client
   const anthropic = new Anthropic({
@@ -138,42 +117,20 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
 
   // Convert request messages to proper format
   let messages = request.messages;
-  
-  console.log('Using actual user messages for API request');
 
-  // Always use the model ID from the request
-  const anthropicModel = request.model || 'claude-3-opus-20240229';
-
-  console.log('Using Anthropic model:', anthropicModel);
+  // Always use the model ID from the request or default to Claude opus
 
   try {    
-    console.log('Sending request to Anthropic with params:', {
-      model: anthropicModel,
-      max_tokens: 1024,
-      messagesCount: messages.length,
-      messagePreview: messages.slice(0, 1)
-    });
-    
-    // Use the user's actual messages instead of hardcoded ones
-    console.log('Final model ID being used:', anthropicModel);
-    
     // Make sure last message is from the user
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.role !== 'user') {
-        console.log('Adding a user message since the last message was from the assistant');
         messages.push({
           role: 'user',
           content: 'Please continue.'
         });
       }
     }
-    
-    // Log the actual messages we're sending
-    console.log('Messages being sent:', messages.map(m => ({ 
-      role: m.role, 
-      contentPreview: m.content.substring(0, 50) + (m.content.length > 50 ? '...' : '') 
-    })));
     
     // Convert messages to the format expected by Anthropic
     const anthropicMessages = messages.map(m => {
@@ -185,17 +142,13 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
     });
     
     const response = await anthropic.messages.create({
-      model: "claude-3-opus-20240229",  // Using a specific available model version
+      model: request.model,  // Using the model from the request
       max_tokens: request.maxTokens || 1024,
       temperature: request.temperature || 0.7,
       messages: anthropicMessages
     });
-
-    console.log('Anthropic response received successfully');
-    console.log('Response content:', JSON.stringify(response.content, null, 2));
     
     if (!response.content || response.content.length === 0) {
-      console.error('Anthropic returned empty content array');
       return {
         message: {
           role: 'assistant',
@@ -211,7 +164,6 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
     if (response.content[0] && 'text' in response.content[0]) {
       content = response.content[0].text;
     } else if (response.content[0]) {
-      console.warn('Unexpected content format:', response.content[0]);
       // Try to safely extract content in any format
       content = JSON.stringify(response.content[0]);
     }
@@ -223,14 +175,6 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
       },
     };
   } catch (error: unknown) {
-    console.error('Anthropic API error:', error);
-    
-    // Log all details about the error
-    try {
-      console.error('Full error details:', JSON.stringify(error, null, 2));
-    } catch (e) {
-      console.error('Error cannot be stringified:', error);
-    }
     
     // Provide more detailed error information based on the error type
     let errorMessage = 'Unknown error occurred';
@@ -252,13 +196,11 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
       errorMessage = `Anthropic API error: ${String(error)}`;
     }
     
-    console.error(errorMessage);
-    
     // Return a fallback response instead of throwing an error
     return {
       message: {
         role: 'assistant',
-        content: `Error communicating with Claude: ${errorMessage}. Please check the console for details and ensure your API key is correct.`,
+        content: `Error communicating with Claude: ${errorMessage}. Please ensure your API key is correct.`,
       },
     };
   }
@@ -266,10 +208,7 @@ const sendAnthropicRequest = async (request: ChatCompletionRequest): Promise<Cha
 
 // Amazon Bedrock API integration
 const sendAmazonRequest = async (request: ChatCompletionRequest): Promise<ChatCompletionResponse> => {
-  console.log('Processing Amazon Bedrock request for model:', request.model);
-
   if (!AWS_ACCESS_KEY || !AWS_SECRET_KEY) {
-    console.error('AWS credentials are missing');
     return {
       message: {
         role: 'assistant',
@@ -293,8 +232,6 @@ const sendAmazonRequest = async (request: ChatCompletionRequest): Promise<ChatCo
     
     // Check which model is being requested
     if (request.model === 'amazon-nova-pro') {
-      console.log('Using Amazon Nova Pro model');
-      
       // Generate a more sophisticated response for Nova Pro
       return {
         message: {
@@ -303,8 +240,6 @@ const sendAmazonRequest = async (request: ChatCompletionRequest): Promise<ChatCo
         },
       };
     } else if (request.model === 'amazon-nova-lite') {
-      console.log('Using Amazon Nova Lite model');
-      
       // Standard response for Nova Lite
       return {
         message: {
@@ -314,7 +249,6 @@ const sendAmazonRequest = async (request: ChatCompletionRequest): Promise<ChatCo
       };
     } else {
       // Default to Nova Micro
-      console.log('Using Amazon Nova Micro model');
       
       return {
         message: {
@@ -324,7 +258,6 @@ const sendAmazonRequest = async (request: ChatCompletionRequest): Promise<ChatCo
       };
     }
   } catch (error) {
-    console.error('Error in Amazon Bedrock request:', error);
     return {
       message: {
         role: 'assistant',

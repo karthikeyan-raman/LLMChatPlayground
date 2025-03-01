@@ -29,7 +29,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const [message, setMessage] = useState('');
   const [showFileUploader, setShowFileUploader] = useState(false);
   const [attachmentIds, setAttachmentIds] = useState<string[]>([]);
-  const textFieldRef = useRef<HTMLDivElement>(null);
 
   // Temporary message ID for file uploader
   const tempMessageId = useRef(uuidv4());
@@ -74,12 +73,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             mb: 2,
             p: 2,
             border: '1px solid',
-            borderColor: 'divider',
-            borderRadius: '16px',
+            borderColor: 'rgba(145, 158, 171, 0.12)',
+            borderRadius: '12px',
             position: 'relative',
-            backdropFilter: 'blur(10px)',
-            backgroundColor: 'rgba(79, 70, 229, 0.05)',
-            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(8px)',
+            backgroundColor: 'rgba(59, 130, 246, 0.05)',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
           }}
         >
           <IconButton
@@ -90,7 +89,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             <CloseIcon fontSize="small" />
           </IconButton>
           
-          <Typography variant="subtitle2" gutterBottom>
+          <Typography 
+            variant="subtitle2" 
+            gutterBottom
+            sx={{
+              fontWeight: 600,
+              color: 'rgba(59, 130, 246, 0.9)',
+              fontSize: '0.9rem'
+            }}
+          >
             Upload Files
           </Typography>
           
@@ -107,18 +114,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         elevation={0}
         sx={{
           display: 'flex',
-          alignItems: 'flex-end',
-          p: 2,
+          alignItems: 'center',
+          p: 1.5,
           border: '1px solid',
-          borderColor: 'divider',
-          borderRadius: '16px',
-          backdropFilter: 'blur(10px)',
+          borderColor: 'rgba(145, 158, 171, 0.12)',
+          borderRadius: '12px',
+          backdropFilter: 'blur(8px)',
           backgroundColor: 'rgba(255, 255, 255, 0.03)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)',
-          transition: 'all 0.2s ease',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+          transition: 'all 0.2s ease-in-out',
           '&:focus-within': {
-            borderColor: 'primary.main',
-            boxShadow: '0 4px 20px rgba(79, 70, 229, 0.2)',
+            borderColor: 'rgba(59, 130, 246, 0.5)',
+            boxShadow: '0 0 0 2px rgba(59, 130, 246, 0.2)',
           }
         }}
       >
@@ -140,9 +147,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           sx={{
             '& .MuiInputBase-root': {
               backgroundColor: 'transparent',
-              fontSize: '1rem',
-              padding: '10px 14px',
-              borderRadius: '12px',
+              fontSize: '0.95rem',
+              padding: '6px 10px',
+              borderRadius: '8px',
+              fontWeight: 400,
+              lineHeight: 1.5
             },
             '& .MuiOutlinedInput-notchedOutline': {
               border: 'none',
@@ -155,8 +164,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             },
             '& .MuiInputBase-input': {
               '&::placeholder': {
-                opacity: 0.6,
-                fontStyle: 'italic',
+                opacity: 0.7,
+                fontStyle: 'normal',
+                fontWeight: 400
               }
             }
           }}
@@ -170,11 +180,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                 disabled={disabled || isLoading}
                 onClick={() => setShowFileUploader(!showFileUploader)}
                 sx={{
-                  backgroundColor: 'rgba(79, 70, 229, 0.1)',
-                  borderRadius: '12px',
+                  backgroundColor: showFileUploader ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                  borderRadius: '10px',
                   padding: '8px',
+                  color: showFileUploader ? 'rgba(59, 130, 246, 0.9)' : 'text.secondary',
                   '&:hover': {
-                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    backgroundColor: 'rgba(59, 130, 246, 0.15)',
                   }
                 }}
               >
@@ -192,17 +203,20 @@ export const ChatInput: React.FC<ChatInputProps> = ({
                   disabled || isLoading || (!message.trim() && attachmentIds.length === 0)
                 }
                 sx={{
-                  backgroundColor: 'rgba(79, 70, 229, 0.8)',
+                  backgroundColor: 'rgba(59, 130, 246, 0.9)',
                   color: 'white',
-                  borderRadius: '12px',
+                  borderRadius: '10px',
                   padding: '8px',
                   ml: 1,
+                  transition: 'all 0.2s',
                   '&:hover': {
-                    backgroundColor: 'rgba(79, 70, 229, 1)',
+                    backgroundColor: 'rgba(59, 130, 246, 1)',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 4px 8px rgba(59, 130, 246, 0.25)'
                   },
                   '&.Mui-disabled': {
-                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
-                    color: 'rgba(255, 255, 255, 0.3)',
+                    backgroundColor: 'rgba(145, 158, 171, 0.2)',
+                    color: 'rgba(145, 158, 171, 0.5)'
                   }
                 }}
               >

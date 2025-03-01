@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { fileToAttachment, getFileType } from '../utils/fileHelpers';
-import { Attachment, FileType } from '../types';
+import { useDropzone, DropzoneRootProps, DropzoneInputProps, FileRejection } from 'react-dropzone';
+import { getFileType } from '../utils/fileHelpers';
+import { Attachment } from '../types';
 
 interface UseFileUploadOptions {
   maxFiles?: number;
@@ -11,8 +11,8 @@ interface UseFileUploadOptions {
 }
 
 interface UseFileUploadResult {
-  getRootProps: any;
-  getInputProps: any;
+  getRootProps: <T extends DropzoneRootProps>(props?: T) => T;
+  getInputProps: <T extends DropzoneInputProps>(props?: T) => T;
   isDragActive: boolean;
   isLoading: boolean;
   files: File[];
@@ -21,7 +21,7 @@ interface UseFileUploadResult {
   setAttachments: React.Dispatch<React.SetStateAction<Omit<Attachment, 'id'>[]>>;
   error: string | null;
   clearFiles: () => void;
-  onDrop: (acceptedFiles: File[], rejectedFiles: any[]) => Promise<void>;
+  onDrop: (acceptedFiles: File[], rejectedFiles: FileRejection[]) => Promise<void>;
 }
 
 export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUploadResult => {
@@ -45,17 +45,16 @@ export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUpload
   const [error, setError] = useState<string | null>(null);
 
   const onDrop = useCallback(
-    async (acceptedFiles: File[], rejectedFiles: any[]) => {
+    async (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       setError(null);
 
       if (!acceptedFiles || acceptedFiles.length === 0) {
         // No files were accepted
-        console.log('No files were accepted in the drop');
         
         // Handle rejected files if any
         if (rejectedFiles.length > 0) {
           const errorMessages = rejectedFiles.map((file) => {
-            const errors = file.errors.map((e: any) => e.message).join(', ');
+            const errors = file.errors.map((e) => e.message).join(', ');
             return `${file.file.name}: ${errors}`;
           });
           setError(errorMessages.join('; '));
@@ -82,8 +81,6 @@ export const useFileUpload = (options: UseFileUploadOptions = {}): UseFileUpload
           preview: file.name,
           content: file.name,
         }));
-
-        console.log('Created attachments:', newAttachments);
 
         setFiles((prev) => [...prev, ...acceptedFiles]);
         setAttachments((prev) => [...prev, ...newAttachments]);
