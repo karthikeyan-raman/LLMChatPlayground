@@ -232,6 +232,7 @@ const App: React.FC = () => {
   const [currentChatId, setCurrentChatId] = useState<string>('1');
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRequestPending, setIsRequestPending] = useState(false);
   const [selectedModel, setSelectedModel] = useState('amazon-nova-pro');
   const [showAttach, setShowAttach] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -462,6 +463,7 @@ const App: React.FC = () => {
 
   // Send a message in the current chat
   const handleSendMessage = useCallback(() => {
+    setIsRequestPending(false);
     if (!inputMessage.trim() && attachments.length === 0) return;
     
     const timestamp = Date.now();
@@ -558,14 +560,20 @@ const App: React.FC = () => {
       // instead of the real API call
       
       // Simulate the API response based on selected model
-      let simulatedContent = `This is a simulated response from ${getCurrentModel().name}. 
-The real API integration is being debugged.
-Your message: "${messages[messages.length - 1]?.content || 'No content'}"`;
+      let simulatedContent = '';
+      try {
+        setIsRequestPending(true);
+        const response = await fetch('http://localhost:5173/api/hello');
+        simulatedContent = await response.json();
+        console.log('Response from API:', simulatedContent);
+      } catch (error) {
+        console.error('Error fetching from API:', error);
+      }
       
       const response = {
         message: {
           role: 'assistant',
-          content: simulatedContent
+          content: JSON.stringify(simulatedContent)
         }
       };
       
@@ -655,15 +663,16 @@ Your message: "${messages[messages.length - 1]?.content || 'No content'}"`;
       );
     } finally {
       setIsLoading(false);
+      setIsRequestPending(false);
     }
   }, [chats, currentChatId, getCurrentModel, maxTokens, selectedModel, streamResponse, temperature]);
   
   // Update to use the real API call
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading && !isRequestPending) {
       sendMessageToAPI();
     }
-  }, [isLoading, sendMessageToAPI]);
+  }, [isLoading, isRequestPending, sendMessageToAPI]);
 
   // Format date for display - memoized as a utility function
   const formatDate = useMemo(() => {
